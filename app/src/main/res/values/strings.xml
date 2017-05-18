@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">NCI_Benchmark_1</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_benchmark">Benchmark 1</string>
+    <string name="teststring">The big bad wolf</string>
+</resources>
