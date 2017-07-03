@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee">
+    <servlet>
+        <servlet-name>SyncDeviceServlet</servlet-name>
+        <servlet-class>ie.ncirl.backend_monitor_nci.SyncDeviceServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>SyncDeviceServlet</servlet-name>
+        <url-pattern>/sync_device</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>PersistLogsServlet</servlet-name>
+        <servlet-class>ie.ncirl.backend_monitor_nci.PersistLogsServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>PersistLogsServlet</servlet-name>
+        <url-pattern>/save_device</url-pattern>
+    </servlet-mapping>
+
+    <welcome-file-list>
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
+</web-app>

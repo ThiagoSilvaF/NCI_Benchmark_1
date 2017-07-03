@@ -32,30 +32,34 @@ public class Benchmark extends AppCompatActivity {
 
         compute=(Button)findViewById(R.id.btn1);
         result= (TextView)findViewById(R.id.textView2);
-        teststring = generateSessionKey(9999);///getResources().getString(R.string.teststring);
+        teststring = generateString(9999);///getResources().getString(R.string.teststring);
+
+        Monitor.initMonitor(getApplicationContext(),"1");
     }
 
+
     public void onBeginClick (View view) {
-        tsLong = System.nanoTime();
-        for (Integer i = 0; i<20000; i++) {
+        //tsLong = System.nanoTime();
+        //for (Integer i = 0; i<9999; i++) {
             computeSHAHash(teststring);
-        }
-        Long ttLong = System.nanoTime() - tsLong;
-        tt = ttLong.toString();
-        Integer floor = Math.round(ttLong / 100000000);
-        String score =  floor.toString();
-        output = "SHA-1 hash: " + " " + HashValue + "\n Time Taken (nanoseconds): " + tt + "\n Score: " + score;
-        result.setText(output);
+        //}
+        //Long ttLong = System.nanoTime() - tsLong;
+        //tt = ttLong.toString();
+        //Integer floor = Math.round(ttLong / 100000000);
+        //String score =  floor.toString();
+        //output = "SHA-1 hash: " + " " + HashValue + "\n Time Taken (nanoseconds): " + tt + "\n Score: " + score;
+        //result.setText(output);
+        result.setText("tested!");
     }
 
 
     public void computeSHAHash(final String password)
     {
 
-        new Monitor("localhost:8080", "computeSHAHash", getApplicationContext()) {
+        new Monitor("1","computeSHAHash",getApplicationContext()) {
 
             @Override
-            public void task() {
+            public void taskLocal() {
 
                 MessageDigest mdSha1 = null;
                 try
@@ -67,7 +71,6 @@ public class Benchmark extends AppCompatActivity {
                 try {
                     mdSha1.update(password.getBytes("ASCII"));
                 } catch (UnsupportedEncodingException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
                 byte[] data = mdSha1.digest();
@@ -79,12 +82,17 @@ public class Benchmark extends AppCompatActivity {
                 sb.append(hex);
                 HashValue=sb.toString();
             }
+
+            @Override
+            public void taskRemote() {
+                System.out.print("running remotelly!");
+            }
         }.start();
 
 
     }
 
-    public static String generateSessionKey(int length){
+    public static String generateString(int length){
         String alphabet =
                 new String("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"); //9
         int n = alphabet.length(); //10

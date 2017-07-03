@@ -5,6 +5,9 @@
       <module fileurl="file://$PROJECT_DIR$/NCI_Benchmark_1.iml" filepath="$PROJECT_DIR$/NCI_Benchmark_1.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/app_monitor/app_monitor.iml" filepath="$PROJECT_DIR$/app_monitor/app_monitor.iml" />
+      <module fileurl="file://$PROJECT_DIR$/backend_monitor/backend_monitor.iml" filepath="$PROJECT_DIR$/backend_monitor/backend_monitor.iml" />
+      <module fileurl="file://$PROJECT_DIR$/backend_monitor_nci/backend_monitor_nci.iml" filepath="$PROJECT_DIR$/backend_monitor_nci/backend_monitor_nci.iml" />
+      <module fileurl="file://$PROJECT_DIR$/benchmark_backend/benchmark_backend.iml" filepath="$PROJECT_DIR$/benchmark_backend/benchmark_backend.iml" />
     </modules>
   </component>
 </project>
