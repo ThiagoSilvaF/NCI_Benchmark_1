@@ -71,13 +71,6 @@ public class PersistLogsServletAsyncTask  extends AsyncTask<Pair<Context, String
 
                 // Read response
                 int responseCode = connection.getResponseCode();
-                System.out.println(responseCode);
-
-               /* if (responseCode == 200) {
-                    return "1";
-                } else {
-                    return "0";
-                }*/
 
             } catch (IOException e) {
                 e.getMessage();

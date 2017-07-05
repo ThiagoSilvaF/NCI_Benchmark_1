@@ -21,7 +21,13 @@ public class GetConfigServlet extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
+
+        String appId      = req.getParameter("appId");
+        String methodName = req.getParameter("methodName");
+        String device     = req.getParameter("device");
+
         //TODO implement the logic here - STATISTICS
+
         resp.setStatus(200);
 
     }

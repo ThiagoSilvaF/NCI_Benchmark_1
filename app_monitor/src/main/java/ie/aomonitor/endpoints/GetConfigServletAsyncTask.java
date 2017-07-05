@@ -4,8 +4,6 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.support.v4.util.Pair;
 
-import com.google.gson.Gson;
-
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -15,12 +13,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import ie.aomonitor.DatabaseHandler;
 import ie.aomonitor.DeviceLog;
-import ie.aomonitor.Monitor;
 
 import static ie.aomonitor.Constants.GAE_ENDPOINT;
 
@@ -28,22 +23,59 @@ import static ie.aomonitor.Constants.GAE_ENDPOINT;
  * Created by Administrativo on 04/07/2017.
  */
 
-public class GetConfigServletAsyncTask extends AsyncTask<Pair<Context, String>, Void, String> {
+public class GetConfigServletAsyncTask extends AsyncTask<Pair<String, String>, Void, String> {
     private Context context;
     public AsyncResponse delegate = null;
+    private DeviceLog device;
 
-    public GetConfigServletAsyncTask(AsyncResponse asyncResponse) {
+    public GetConfigServletAsyncTask(DeviceLog device, AsyncResponse asyncResponse) {
         delegate = asyncResponse;//Assigning call back interfacethrough constructor
+        this.device = device;
     }
 
     @Override
-    protected String doInBackground(Pair<Context, String>... params) {
+    protected String doInBackground(Pair<String, String>... params) {
 
-        context = params[0].first;
-        String param = params[1].second;
+        String appId      = params[0].first;
+        String methodName = params[1].second;
 
-        //TODO implement here
-        return "Testing";
+
+        URL url = null;
+        try {
+            url = new URL(GAE_ENDPOINT + "get_config");
+
+             HttpURLConnection connection = null;
+
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setDoInput(true);
+            connection.setDoOutput(true);
+            // Build name data request params
+            Map<String, String> nameValuePairs = new HashMap<>();
+            nameValuePairs.put("appId", appId);
+            nameValuePairs.put("methodName", methodName);
+            nameValuePairs.put("device", device.getDevice());
+
+            String postParams = buildPostDataString(nameValuePairs);
+
+            // Execute HTTP Post
+            OutputStream outputStream = connection.getOutputStream();
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
+            writer.write(postParams);
+            writer.flush();
+            writer.close();
+            outputStream.close();
+            connection.connect();
+            // Read response
+            int responseCode = connection.getResponseCode();
+            System.out.println(responseCode);
+
+        } catch (IOException e) {
+            e.getMessage();
+            return "0";
+        }
+
+        return "1";
 
     }
 

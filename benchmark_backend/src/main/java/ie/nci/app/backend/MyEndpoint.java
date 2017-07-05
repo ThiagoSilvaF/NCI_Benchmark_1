@@ -9,7 +9,11 @@ package ie.nci.app.backend;
 import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.ApiNamespace;
+import com.google.appengine.repackaged.org.apache.commons.codec.binary.Base64;
 
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Random;
 
 import javax.inject.Named;
@@ -40,10 +44,10 @@ public class MyEndpoint {
     }
      */
     @ApiMethod(name = "generateString")
-    public MyBean generateString(@Named("length") long length){
+    public MyBean generateString(@Named("param") String param){
         MyBean response = new MyBean();
 
-        String alphabet =
+       /* String alphabet =
                 new String("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"); //9
         int n = alphabet.length(); //10
 
@@ -56,6 +60,38 @@ public class MyEndpoint {
 
         response.setData(result);
         return response;
+*/
+
+
+
+
+       // String param = req.getParameter("text_param");
+       // resp.setContentType("text/plain");
+
+        MessageDigest mdSha1 = null;
+        try
+        {
+            mdSha1 = MessageDigest.getInstance("SHA-1");
+        } catch (NoSuchAlgorithmException e1) {
+            e1.getMessage();
+        }
+        try {
+            mdSha1.update(param.getBytes("ASCII"));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        byte[] data = mdSha1.digest();
+        StringBuffer sb = new StringBuffer();
+        String hex=null;
+
+        hex = Base64.encodeBase64String(data);
+
+        sb.append(hex);
+        //HashValue=sb.toString();
+        response.setData(sb.toString());
+        return response;
+
+
     }
 
 

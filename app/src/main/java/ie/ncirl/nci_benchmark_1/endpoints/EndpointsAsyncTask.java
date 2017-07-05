@@ -22,6 +22,11 @@ import ie.nci.app.backend.myApi.MyApi;
 public class EndpointsAsyncTask extends AsyncTask<Pair<Context, String>, Void, String> {
     private static MyApi myApiService = null;
     private Context context;
+    private String param;
+
+    public EndpointsAsyncTask(String param){
+        this.param = param;
+    }
 
     @Override
     protected String doInBackground(Pair<Context, String>... params) {
@@ -44,12 +49,12 @@ public class EndpointsAsyncTask extends AsyncTask<Pair<Context, String>, Void, S
         }
 
         context = params[0].first;
-        String name = params[0].second;
+        //String name = params[0].second;
 
-        long stringLenght = 1000;
+        //long stringLenght = 1000;
 
         try {
-            return myApiService.generateString(stringLenght).execute().getData();
+            return myApiService.generateString(param).execute().getData();
         } catch (IOException e) {
             return e.getMessage();
         }

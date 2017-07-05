@@ -14,6 +14,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Random;
 
 import ie.aomonitor.Monitor;
+import ie.ncirl.nci_benchmark_1.endpoints.EndpointsAsyncTask;
 
 public class Benchmark extends AppCompatActivity {
 
@@ -85,6 +86,8 @@ public class Benchmark extends AppCompatActivity {
 
             @Override
             public void taskRemote() {
+                EndpointsAsyncTask eat = new EndpointsAsyncTask(password);
+                eat.execute();
                 System.out.print("running remotelly!");
             }
         }.start();

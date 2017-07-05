@@ -27,6 +27,7 @@ public class SyncDeviceServlet extends HttpServlet {
             resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
         }
         resp.setStatus(HttpServletResponse.SC_OK);
+       // resp.set
 
     }
 }

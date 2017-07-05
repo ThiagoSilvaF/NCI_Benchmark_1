@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 
 import ie.aomonitor.endpoints.AsyncResponse;
+import ie.aomonitor.endpoints.GetConfigServletAsyncTask;
 import ie.aomonitor.endpoints.PersistLogsServletAsyncTask;
 import ie.aomonitor.endpoints.SyncDeviceServletAsyncTask;
 import ie.aomonitor.utils.Connectivity;
@@ -215,7 +216,16 @@ public abstract class Monitor extends Thread {
      * This method will decide where to run the workload
      */
     private boolean getConfig(String appId, String methodName) {
-        //TODO implement method to decide where to run the workload
+        GetConfigServletAsyncTask asyncTask = new GetConfigServletAsyncTask(deviceLog, new AsyncResponse() {
+
+            @Override
+            public void processFinish(String output) {
+                System.out.print("chegando aqui: " + output);
+            }
+
+        });
+        asyncTask.execute(new Pair<String, String>(appId,methodName));
+
         return false;
     }
 

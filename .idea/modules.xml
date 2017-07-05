@@ -8,6 +8,7 @@
       <module fileurl="file://$PROJECT_DIR$/backend_monitor/backend_monitor.iml" filepath="$PROJECT_DIR$/backend_monitor/backend_monitor.iml" />
       <module fileurl="file://$PROJECT_DIR$/backend_monitor_nci/backend_monitor_nci.iml" filepath="$PROJECT_DIR$/backend_monitor_nci/backend_monitor_nci.iml" />
       <module fileurl="file://$PROJECT_DIR$/benchmark_backend/benchmark_backend.iml" filepath="$PROJECT_DIR$/benchmark_backend/benchmark_backend.iml" />
+      <module fileurl="file://$PROJECT_DIR$/benchmark_backend_nci/benchmark_backend_nci.iml" filepath="$PROJECT_DIR$/benchmark_backend_nci/benchmark_backend_nci.iml" />
     </modules>
   </component>
 </project>
