@@ -32,18 +32,13 @@ public class PersistLogsServlet  extends HttpServlet {
         Long ret = 0L;
 
         try {
-            java.util.logging.Logger.getLogger("todtm.getImage").warning("*********** funcionando normal ***********");
             GAEClient g = new GAEClient();
-            java.util.logging.Logger.getLogger("todtm.getImage").warning("*********** instanciado ***********");
             DeviceLog device = null;
 
             device = new Gson().fromJson(param, DeviceLog.class);
-            java.util.logging.Logger.getLogger("todtm.getImage").warning("*********** criou o json ***********");
 
             g.addProcessInfoToTheCloud(device);
-            java.util.logging.Logger.getLogger("todtm.getImage").warning( "*********** rodou o cloud ***********");
         }catch (Exception ex){
-            java.util.logging.Logger.getLogger("todtm.getImage").warning( "***********  ***********" + ex.getMessage());
             ex.printStackTrace();
             resp.setStatus(500);
             return;

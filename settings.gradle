@@ -1,1 +1,1 @@
-include ':app', ':app_monitor', ':benchmark_backend', ':backend_monitor', ':backend_monitor_nci', ':benchmark_backend_nci'
+include ':app', ':app_monitor', ':benchmark_backend', ':backend_monitor', ':backend_monitor_nci', ':benchmark_backend_nci', ':config_module'

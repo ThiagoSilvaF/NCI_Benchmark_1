@@ -13,9 +13,11 @@ import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
 
 import java.io.IOException;
 
+import ie.aomonitor.endpoints.AsyncResponse;
 import ie.nci.app.backend.myApi.MyApi;
 
-/**
+/**public EndpointsAsyncTask(AsyncResponse ) {
+    }
  * Created by Administrativo on 07/06/2017.
  */
 
@@ -24,32 +26,32 @@ public class EndpointsAsyncTask extends AsyncTask<Pair<Context, String>, Void, S
     private Context context;
     private String param;
 
-    public EndpointsAsyncTask(String param){
-        this.param = param;
+
+    public AsyncResponse delegate = null;
+
+    public EndpointsAsyncTask(AsyncResponse asyncResponse) {
+        delegate = asyncResponse;//Assigning call back interfacethrough constructor
     }
+
+    public EndpointsAsyncTask(AsyncResponse asyncResponse, String password) {
+        delegate = asyncResponse;//Assigning call back interfacethrough constructor
+        this.param = password;
+    }
+
 
     @Override
     protected String doInBackground(Pair<Context, String>... params) {
         if(myApiService == null) {  // Only do this once
+
             MyApi.Builder builder = new MyApi.Builder(AndroidHttp.newCompatibleTransport(),
-                    new AndroidJsonFactory(), null)
-                    // options for running against local devappserver
-                    // - 10.0.2.2 is localhost's IP address in Android emulator
-                    // - turn off compression when running against local devappserver
-                    .setRootUrl("http://10.0.2.2:8080/_ah/api/")
-                    .setGoogleClientRequestInitializer(new GoogleClientRequestInitializer() {
-                        @Override
-                        public void initialize(AbstractGoogleClientRequest<?> abstractGoogleClientRequest) throws IOException {
-                            abstractGoogleClientRequest.setDisableGZipContent(true);
-                        }
-                    });
-            // end options for devappserver
+                    new AndroidJsonFactory(), null).setRootUrl("https://triking-scout-114623.appspot.com/_ah/api/");
 
             myApiService = builder.build();
+
         }
 
-        context = params[0].first;
-        //String name = params[0].second;
+        //context = params[0].first;
+        //String param = params[0].second;
 
         //long stringLenght = 1000;
 
@@ -62,6 +64,6 @@ public class EndpointsAsyncTask extends AsyncTask<Pair<Context, String>, Void, S
 
     @Override
     protected void onPostExecute(String result) {
-        Toast.makeText(context, result, Toast.LENGTH_LONG).show();
+       // Toast.makeText(context, result, Toast.LENGTH_LONG).show();
     }
 }

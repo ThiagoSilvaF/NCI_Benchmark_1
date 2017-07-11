@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.support.v4.util.Pair;
 
+
 import com.google.gson.Gson;
 
 import java.io.BufferedWriter;
@@ -46,7 +47,6 @@ public class PersistLogsServletAsyncTask  extends AsyncTask<Pair<Context, String
 
         for(DeviceLog d : deviceLogs) {
             String param = new Gson().toJson(d);
-
             try {
                 // Set up the request
                 URL url = new URL(GAE_ENDPOINT + "save_device");

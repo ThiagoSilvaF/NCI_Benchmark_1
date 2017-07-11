@@ -8,10 +8,10 @@ import android.support.v4.util.Pair;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Connection;
 import java.util.HashMap;
 
 import ie.aomonitor.endpoints.AsyncResponse;
-import ie.aomonitor.endpoints.GetConfigServletAsyncTask;
 import ie.aomonitor.endpoints.PersistLogsServletAsyncTask;
 import ie.aomonitor.endpoints.SyncDeviceServletAsyncTask;
 import ie.aomonitor.utils.Connectivity;
@@ -51,6 +51,7 @@ public abstract class Monitor extends Thread {
 
     public static final void initMonitor(final Context context, final String appId){
         //Retrieve specs from the devices
+        db                = new DatabaseHandler(context);
         String memory = null;
         try {
             HashMap<String, String> map = getMemSpecs();
@@ -69,7 +70,7 @@ public abstract class Monitor extends Thread {
                 Build.PRODUCT, Build.MANUFACTURER, Build.BOARD, memory, processor
         );
 
-        db                = new DatabaseHandler(context);
+
 
         if (Connectivity.isConnected(context)) {
             //sync to the cloud all the latest info into the device
@@ -147,35 +148,47 @@ public abstract class Monitor extends Thread {
     }
 
     public static void syncDeviceProfile(Context context, String json) {
-        SyncDeviceServletAsyncTask asyncTask = new SyncDeviceServletAsyncTask(new AsyncResponse() {
-
-            @Override
-            public void processFinish(String output) {
-                System.out.print("chegando aqui: " + output);
-            }
-
-        });
-        asyncTask.execute(new Pair<Context, String>(context, json));
 
         PersistLogsServletAsyncTask persistTask = new PersistLogsServletAsyncTask(new AsyncResponse() {
 
             @Override
             public void processFinish(String output) {
-                System.out.print("chegando aqui 2: " + output);
+                System.out.print(output);
             }
 
         }, context);
         persistTask.execute(new Pair<Context, String>(context, json));
+
+        SyncDeviceServletAsyncTask asyncTask = new SyncDeviceServletAsyncTask(new AsyncResponse() {
+
+            @Override
+            public void processFinish(String output) {
+
+                ConfigLog conf = new com.google.gson.Gson().fromJson(output, ConfigLog.class);
+                if(conf != null) {
+
+                    if (db.getConfigByMethodName(conf.getName()) == null) {
+                        db.addConfigInfo(conf.getName(), conf.getValue());
+                    } else {
+                        db.updateConfigInfo(conf.getName(), conf.getValue());
+                    }
+                }
+            }
+
+        });
+        asyncTask.execute(new android.util.Pair<Context, String>(context, json));
+
     }
 
     @Override
     public void run(){
         long startTime = System.nanoTime();
-
+        boolean isTaskLocal = false;
         if(Connectivity.isConnected(context)){
             int i = isNewScenario();
             if(i == DEVICE_OFFLINE){
                 taskLocal();
+                isTaskLocal = true;
             }else if( i == DEVICE_SLOW_CONNECTED){
                 taskRemote();
             }else if( i == DEVICE_FAST_CONNECTED){
@@ -185,10 +198,12 @@ public abstract class Monitor extends Thread {
                     taskRemote();
                 } else {
                     taskLocal();
+                    isTaskLocal = true;
                 }
             }
         }else{
             taskLocal();
+            isTaskLocal = true;
         }
 
         long endTime = System.nanoTime();
@@ -196,7 +211,11 @@ public abstract class Monitor extends Thread {
         deviceLog.setEndTime(endTime);
         deviceLog.setAppKey(appId);
         deviceLog.setMethodName(methodName);
-
+        if(isTaskLocal) {
+            deviceLog.setEnvironment("LOCAL");
+        }else{
+            deviceLog.setEnvironment("REMOTE");
+        }
         saveWorkloadDetails(deviceLog);
 
 
@@ -216,17 +235,21 @@ public abstract class Monitor extends Thread {
      * This method will decide where to run the workload
      */
     private boolean getConfig(String appId, String methodName) {
-        GetConfigServletAsyncTask asyncTask = new GetConfigServletAsyncTask(deviceLog, new AsyncResponse() {
+        String ret = db.getConfigByMethodName(methodName);
+        if(ret == null){
+            return false;
+        }else if (ret.equals("0")) {
+            return false;
 
-            @Override
-            public void processFinish(String output) {
-                System.out.print("chegando aqui: " + output);
-            }
+            //}else if (ret.equals("1")){
+        }else{
+            return true;
+        }
+        //return false;
 
-        });
-        asyncTask.execute(new Pair<String, String>(appId,methodName));
 
-        return false;
+
+
     }
 
     /**
@@ -238,15 +261,39 @@ public abstract class Monitor extends Thread {
      * 3 for fast conn
      */
     private int isNewScenario(){
-
-        if(!sharedPreferences.getPreferenceBoolean(OFF_LINE_TESTED)){
+        if(sharedPreferences.getPreferenceString(OFF_LINE_TESTED) ==  null){
+            sharedPreferences.setPreference(OFF_LINE_TESTED, "true");
             return DEVICE_OFFLINE;
-        }else if (!sharedPreferences.getPreferenceBoolean(SLOW_CONNECTED)){
-            return DEVICE_SLOW_CONNECTED;
-        }else if (!sharedPreferences.getPreferenceBoolean(FAST_CONNECTED)){
-            return DEVICE_FAST_CONNECTED;
+        }else if(!Connectivity.isConnectedFast(context)){
+            if(sharedPreferences.getPreferenceString(SLOW_CONNECTED) ==  null){
+                sharedPreferences.setPreference(SLOW_CONNECTED, "true");
+                return DEVICE_SLOW_CONNECTED;
+            }
+        } if(Connectivity.isConnectedFast(context)){
+            if(sharedPreferences.getPreferenceString(FAST_CONNECTED) ==  null){
+                sharedPreferences.setPreference(FAST_CONNECTED, "true");
+                return DEVICE_FAST_CONNECTED;
+            }
+        }else{
+            return 0;
         }
         return 0;
+        /**
+        if((sharedPreferences.getPreferenceString(OFF_LINE_TESTED) != null)
+                && (!sharedPreferences.getPreferenceString(OFF_LINE_TESTED).equals("true"))){
+            sharedPreferences.setPreference(OFF_LINE_TESTED, "true");
+            return DEVICE_OFFLINE;
+        }else if ((sharedPreferences.getPreferenceString(SLOW_CONNECTED) != null)
+                &&(!sharedPreferences.getPreferenceString(SLOW_CONNECTED).equals("true"))){
+            sharedPreferences.setPreference(SLOW_CONNECTED, "true");
+            return DEVICE_SLOW_CONNECTED;
+        }else if ((sharedPreferences.getPreferenceString(FAST_CONNECTED) != null)
+                &&(!sharedPreferences.getPreferenceString(FAST_CONNECTED).equals("true"))){
+            sharedPreferences.setPreference(FAST_CONNECTED, "true");
+            return DEVICE_FAST_CONNECTED;
+        }else{
+            return 0;
+        }*/
     }
 
     public abstract void taskLocal();

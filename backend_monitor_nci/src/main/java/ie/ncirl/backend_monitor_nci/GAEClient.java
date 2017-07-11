@@ -21,6 +21,7 @@ public class GAEClient {
 
     private DatastoreService datastore;
 
+
     public void  addProcessInfoToTheCloud(DeviceLog device) {
         //Type listType = new TypeToken<ArrayList<DeviceLog>>(){}.getType();
         //List<DeviceLog> listDL = new Gson().fromJson(jsonParam, listType);
@@ -41,6 +42,7 @@ public class GAEClient {
             task.setProperty("endTime", device.getEndTime());
             task.setProperty("methodName", device.getMethodName());
             task.setProperty("appId", device.getAppKey());
+            task.setProperty("environment", device.getEnvironment());
 
             Key bookKey = datastore.put(task); // Save the Entity
         //}

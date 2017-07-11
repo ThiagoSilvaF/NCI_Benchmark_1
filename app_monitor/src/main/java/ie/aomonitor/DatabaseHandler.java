@@ -2,7 +2,6 @@ package ie.aomonitor;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -11,6 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ie.aomonitor.utils.SharedPreferencesUtils;
+
+import static ie.aomonitor.Constants.FAST_CONNECTED;
+import static ie.aomonitor.Constants.OFF_LINE_TESTED;
+import static ie.aomonitor.Constants.SLOW_CONNECTED;
 
 /**
  * Created by silvat on 24/05/2017.
@@ -27,9 +30,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     // Contacts table name
     private static final String TABLE_PROCESS_INFO = "process_info";
+    private static final String TABLE_CONFIG = "config";
 
     // Contacts Table Columns names
     private static final String KEY_ID          = "id";
+
+    private static final String KEY_CONFIG_NAME = "method_name";
+    private static final String KEY_CONFIG_VALUE= "method_value";
 
     private static final String KEY_BRAND       = "brand";
     private static final String KEY_DEVICE      = "device";
@@ -44,15 +51,24 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_PROCESSOR   = "processor";
     private static final String KEY_APP         = "app_unique_key";
     private static final String KEY_METHOD_NAME = "method_name";
+    private static final String KEY_ENVIRONMENT  = "environment";
+
 
 
     public DatabaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+
+     /*   context.deleteDatabase(DATABASE_NAME);
+        SharedPreferencesUtils sharedPreferences = new SharedPreferencesUtils(context);
+        sharedPreferences.setPreference(OFF_LINE_TESTED, null);
+        sharedPreferences.setPreference(SLOW_CONNECTED, null);
+        sharedPreferences.setPreference(FAST_CONNECTED, null); */
     }
 
     // Creating Tables
     @Override
     public void onCreate(SQLiteDatabase db) {
+
         String CREATE_PROCESS_INFO_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_PROCESS_INFO + "("
                 + KEY_ID + " INTEGER PRIMARY KEY,"
                 + KEY_BRAND + " TEXT,"
@@ -67,9 +83,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + KEY_MEMORY + " TEXT,"
                 + KEY_APP + " TEXT,"
                 + KEY_METHOD_NAME + " TEXT,"
-                + KEY_PROCESSOR + " TEXT" + ")";
+                + KEY_PROCESSOR + " TEXT, "
+                + KEY_ENVIRONMENT + " TEXT )";
         db.execSQL(CREATE_PROCESS_INFO_TABLE);
 
+        String CREATE_CONFIG_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CONFIG + "("
+                + KEY_ID + " INTEGER PRIMARY KEY,"
+                + KEY_CONFIG_NAME + " TEXT,"
+                + KEY_CONFIG_VALUE + " TEXT ) ";
+        db.execSQL(CREATE_CONFIG_TABLE);
 
 
     }
@@ -107,6 +129,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_PROCESSOR, deviceLog.getProcessor());
         values.put(KEY_APP, deviceLog.getAppKey());
         values.put(KEY_METHOD_NAME, deviceLog.getMethodName());
+        values.put(KEY_ENVIRONMENT, deviceLog.getEnvironment());
 
         // Inserting Row
         db.insert(TABLE_PROCESS_INFO, null, values);
@@ -115,11 +138,83 @@ public class DatabaseHandler extends SQLiteOpenHelper {
       //  deleteAll();
     }
 
+    // Adding new contact
+    public void addConfigInfo( String name, String value) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_CONFIG_NAME, name);
+        values.put(KEY_CONFIG_VALUE, value);
+        // Inserting Row
+        db.insert(TABLE_CONFIG, null, values);
+        db.close(); // Closing database connection
+
+        //  deleteAll();
+    }
+
+    public int updateConfigInfo(String name, String value) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        //values.put(KEY_CONFIG_NAME, name);
+        values.put(KEY_CONFIG_VALUE, value);
+        // updating row
+        return db.update(TABLE_CONFIG, values, KEY_CONFIG_NAME + " = ?",
+                new String[] { String.valueOf(name) });
+    }
+
+    //0 - local
+    //1 - remote
+    public String getConfigByMethodName(String name) {
+        List<ConfigLog> list = new ArrayList<ConfigLog>();
+        // Select All Query
+        String selectQuery = "SELECT * FROM " + TABLE_CONFIG;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        ConfigLog dp = new ConfigLog();
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+            do {
+
+                //dp.setID(Integer.parseInt(cursor.getString(0)));
+                dp.setName(name);
+                dp.setValue(cursor.getString(2));
+
+            } while (cursor.moveToNext());
+        }
+
+        // return contact list
+        return dp.getValue();
+
+
+
+        /*
+        Cursor cursor = null;
+        try {
+            String countQuery = "SELECT * FROM " + TABLE_CONFIG +
+                " WHERE "+KEY_CONFIG_NAME+" = ? ";
+            SQLiteDatabase db = this.getReadableDatabase();
+            ContentValues values = new ContentValues();
+            values.put(KEY_CONFIG_NAME, name);
+            cursor = db.rawQuery(countQuery, null);
+            String ret = null;
+            if(cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                ret = cursor.getString(cursor.getColumnIndex("1"));
+            }
+            return ret;
+        }finally {
+            cursor.close();
+        }
+*/
+    }
+
     // Getting All DB Info
     public List<DeviceLog> getAllProcessInfo() {
         List<DeviceLog> list = new ArrayList<DeviceLog>();
         // Select All Query
-        String selectQuery = "SELECT  * FROM " + TABLE_PROCESS_INFO;
+        String selectQuery = "SELECT * FROM " + TABLE_PROCESS_INFO;
 
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
@@ -142,6 +237,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 dp.setAppKey(cursor.getString(11));
                 dp.setMethodName(cursor.getString(12));
                 dp.setProcessor(cursor.getString(13));
+                dp.setEnvironment(cursor.getString(14));
 
 
                 // Adding contact to list
@@ -160,17 +256,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
 
-
-    // Updating single contact
-    /*public int updateContact(Contact contact) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(KEY_NAME, contact.getName());
-        values.put(KEY_PH_NO, contact.getPhoneNumber());
-        // updating row
-        return db.update(TABLE_CONTACTS, values, KEY_ID + " = ?",
-                new String[] { String.valueOf(contact.getID()) });
-    }*/
 
     // Deleting single contact
     /*public void deleteContact(Contact contact) {

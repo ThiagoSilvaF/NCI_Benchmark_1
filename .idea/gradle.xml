@@ -14,6 +14,7 @@
             <option value="$PROJECT_DIR$/backend_monitor_nci" />
             <option value="$PROJECT_DIR$/benchmark_backend" />
             <option value="$PROJECT_DIR$/benchmark_backend_nci" />
+            <option value="$PROJECT_DIR$/config_module" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

@@ -7,13 +7,17 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+import ie.aomonitor.endpoints.AsyncResponse;
 
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Random;
 
+import ie.aomonitor.ConfigLog;
 import ie.aomonitor.Monitor;
+import ie.aomonitor.endpoints.AsyncResponse;
 import ie.ncirl.nci_benchmark_1.endpoints.EndpointsAsyncTask;
 
 public class Benchmark extends AppCompatActivity {
@@ -25,6 +29,9 @@ public class Benchmark extends AppCompatActivity {
     private String tt;
     private String output;
     private long tsLong;
+
+    private String testeEnv = "def";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,17 +47,8 @@ public class Benchmark extends AppCompatActivity {
 
 
     public void onBeginClick (View view) {
-        //tsLong = System.nanoTime();
-        //for (Integer i = 0; i<9999; i++) {
-            computeSHAHash(teststring);
-        //}
-        //Long ttLong = System.nanoTime() - tsLong;
-        //tt = ttLong.toString();
-        //Integer floor = Math.round(ttLong / 100000000);
-        //String score =  floor.toString();
-        //output = "SHA-1 hash: " + " " + HashValue + "\n Time Taken (nanoseconds): " + tt + "\n Score: " + score;
-        //result.setText(output);
-        result.setText("tested!");
+        computeSHAHash(teststring);
+        Toast.makeText(getApplicationContext(), testeEnv, Toast.LENGTH_LONG).show();
     }
 
 
@@ -82,18 +80,30 @@ public class Benchmark extends AppCompatActivity {
 
                 sb.append(hex);
                 HashValue=sb.toString();
+                testeEnv = "LOCAL";
             }
 
             @Override
             public void taskRemote() {
-                EndpointsAsyncTask eat = new EndpointsAsyncTask(password);
+
+
+                EndpointsAsyncTask eat = new EndpointsAsyncTask(new AsyncResponse() {
+                    @Override
+                    public void processFinish(String output) {
+
+                        Toast.makeText(getApplicationContext(), output, Toast.LENGTH_LONG).show();
+                    }
+                }, password);
+
+
                 eat.execute();
-                System.out.print("running remotelly!");
+                testeEnv = "REMOTE";
             }
         }.start();
 
 
     }
+
 
     public static String generateString(int length){
         String alphabet =
@@ -105,7 +115,6 @@ public class Benchmark extends AppCompatActivity {
 
 
         for (int i=0; i<length; i++) {
-            System.out.println(i);
             result = result + alphabet.charAt(r.nextInt(n));
         }
 

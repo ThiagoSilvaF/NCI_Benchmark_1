@@ -23,6 +23,8 @@ public class DeviceLog {
     private String appKey;
     private String methodName;
 
+    private String environment;
+
     public DeviceLog(){}
 
     public DeviceLog(String brand, String device, String hardware, String model, String product, String manufacturer, String board, String memory, String processor) {
@@ -131,5 +133,13 @@ public class DeviceLog {
 
     public void setMethodName(String methodName) {
         this.methodName = methodName;
+    }
+
+    public String getEnvironment() {
+        return environment;
+    }
+
+    public void setEnvironment(String environment) {
+        this.environment = environment;
     }
 }

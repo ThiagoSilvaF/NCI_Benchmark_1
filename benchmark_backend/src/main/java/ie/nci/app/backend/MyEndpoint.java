@@ -47,26 +47,6 @@ public class MyEndpoint {
     public MyBean generateString(@Named("param") String param){
         MyBean response = new MyBean();
 
-       /* String alphabet =
-                new String("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"); //9
-        int n = alphabet.length(); //10
-
-        String result = new String();
-        Random r = new Random(); //11
-
-        for (int i=0; i<length; i++) {
-            result = result + alphabet.charAt(r.nextInt(n));
-        }
-
-        response.setData(result);
-        return response;
-*/
-
-
-
-
-       // String param = req.getParameter("text_param");
-       // resp.setContentType("text/plain");
 
         MessageDigest mdSha1 = null;
         try

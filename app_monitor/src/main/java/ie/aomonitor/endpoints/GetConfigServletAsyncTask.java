@@ -37,7 +37,7 @@ public class GetConfigServletAsyncTask extends AsyncTask<Pair<String, String>, V
     protected String doInBackground(Pair<String, String>... params) {
 
         String appId      = params[0].first;
-        String methodName = params[1].second;
+        String methodName = params[0].second;
 
 
         URL url = null;
