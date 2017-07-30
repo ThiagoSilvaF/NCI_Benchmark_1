@@ -1,22 +1,22 @@
 package ie.ncirl.backend_monitor_nci;
 
-class Config{
+class Config {
 
-    String device;
+	String device;
 	String appId;
 	String methodName;
 	String environment;
-	Long timeElapsed; 
-	
-	Config(){}
-	Config(String device, String appId, String methodName , String environment, Long timeElapsed ){
+	Long avgTime;
+
+	public Config(){}
+	public Config(String device, String appId, String methodName , String environment, Long avgTime ){
 		this.device = device;
 		this.environment = environment;
 		this.appId = appId;
 		this.methodName = methodName;
-		this.timeElapsed = timeElapsed;
+		this.avgTime = avgTime;
 	}
-	
+
 	public String getDevice() {
 		return device;
 	}
@@ -41,13 +41,13 @@ class Config{
 	public void setMethodName(String methodName) {
 		this.methodName = methodName;
 	}
-	public Long getTimeElapsed() {
-		return timeElapsed;
+	public Long getAvgTime() {
+		return avgTime;
 	}
-	public void setTimeElapsed(Long timeElapsed) {
-		this.timeElapsed = timeElapsed;
+	public void setAvgTime(Long avgTime) {
+		this.avgTime = avgTime;
 	}
-	
-	
-	
+
+
+
 }

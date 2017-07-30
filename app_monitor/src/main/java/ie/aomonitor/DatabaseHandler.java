@@ -58,11 +58,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public DatabaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
 
-     /*   context.deleteDatabase(DATABASE_NAME);
+       /* context.deleteDatabase(DATABASE_NAME);
         SharedPreferencesUtils sharedPreferences = new SharedPreferencesUtils(context);
         sharedPreferences.setPreference(OFF_LINE_TESTED, null);
         sharedPreferences.setPreference(SLOW_CONNECTED, null);
-        sharedPreferences.setPreference(FAST_CONNECTED, null); */
+        sharedPreferences.setPreference(FAST_CONNECTED, null);*/
     }
 
     // Creating Tables
@@ -135,7 +135,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.insert(TABLE_PROCESS_INFO, null, values);
         db.close(); // Closing database connection
 
-      //  deleteAll();
+
     }
 
     // Adding new contact

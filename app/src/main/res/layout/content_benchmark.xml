@@ -36,10 +36,9 @@
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
             android:textSize="20dp"
-            android:text="Begin Sequence..."
+            android:text="ACTION ENCRYPT..."
             android:onClick="onBeginClick"
-            android:textColor="@color/colorPrimary"
-            style="@style/Base.Widget.AppCompat.Button.Borderless.Colored"/>
+            android:textColor="@color/colorPrimary"/>
 
         <TextView
             android:id="@+id/textView2"
@@ -49,6 +48,7 @@
             android:textSize="15dp"
             android:text="Output will go here..."
             android:layout_height="wrap_content" />
+
 
 
     </LinearLayout>

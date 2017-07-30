@@ -3,67 +3,109 @@ package ie.ncirl.nci_benchmark_1.endpoints;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.support.v4.util.Pair;
-import android.widget.Toast;
+import com.google.gson.Gson;
 
-import com.google.api.client.extensions.android.http.AndroidHttp;
-import com.google.api.client.extensions.android.json.AndroidJsonFactory;
-import com.google.api.client.googleapis.services.AbstractGoogleClientRequest;
-import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
-
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Map;
 
+import javax.net.ssl.HttpsURLConnection;
+
+import ie.aomonitor.ConfigMonitor;
 import ie.aomonitor.endpoints.AsyncResponse;
-import ie.nci.app.backend.myApi.MyApi;
 
-/**public EndpointsAsyncTask(AsyncResponse ) {
-    }
- * Created by Administrativo on 07/06/2017.
- */
+import static ie.aomonitor.Constants.GAE_ENDPOINT;
 
-public class EndpointsAsyncTask extends AsyncTask<Pair<Context, String>, Void, String> {
-    private static MyApi myApiService = null;
+public class EndpointsAsyncTask extends AsyncTask<android.util.Pair<Context, String>, Void, String> {
+
     private Context context;
-    private String param;
-
-
     public AsyncResponse delegate = null;
 
-    public EndpointsAsyncTask(AsyncResponse asyncResponse) {
+    public EndpointsAsyncTask(AsyncResponse asyncResponse, Context context) {
         delegate = asyncResponse;//Assigning call back interfacethrough constructor
+        this.context = context;
     }
-
-    public EndpointsAsyncTask(AsyncResponse asyncResponse, String password) {
-        delegate = asyncResponse;//Assigning call back interfacethrough constructor
-        this.param = password;
-    }
-
 
     @Override
-    protected String doInBackground(Pair<Context, String>... params) {
-        if(myApiService == null) {  // Only do this once
-
-            MyApi.Builder builder = new MyApi.Builder(AndroidHttp.newCompatibleTransport(),
-                    new AndroidJsonFactory(), null).setRootUrl("https://triking-scout-114623.appspot.com/_ah/api/");
-
-            myApiService = builder.build();
-
-        }
-
-        //context = params[0].first;
-        //String param = params[0].second;
-
-        //long stringLenght = 1000;
+    protected String doInBackground(android.util.Pair<Context, String>... params) {
 
         try {
-            return myApiService.generateString(param).execute().getData();
+            // Set up the request
+            URL url = new URL(GAE_ENDPOINT+"sync_config");
+            //URL url = new URL("http://10.0.2.2:8080/_ah/api/sync_device");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setDoInput(true);
+            connection.setDoOutput(true);
+
+            // Build name data request params
+            //Map<String, String> nameValuePairs = new HashMap<>();
+            //nameValuePairs.put("appId", appId);
+            //nameValuePairs.put("device", device);
+            //String postParams = buildPostDataString(nameValuePairs);
+
+            // Execute HTTP Post
+            OutputStream outputStream = connection.getOutputStream();
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
+            //writer.write(postParams);
+            writer.flush();
+            writer.close();
+            outputStream.close();
+            connection.connect();
+
+            // Read response
+            int responseCode = connection.getResponseCode();
+            StringBuilder response = new StringBuilder();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                response.append(line);
+            }
+            reader.close();
+            //ConfigMonitor conf = new Gson().fromJson(response.toString(), ConfigMonitor.class);
+            if (responseCode == HttpsURLConnection.HTTP_OK) {
+                return response.toString();
+            }
+            return "Error: " + responseCode + " " + connection.getResponseMessage();
+
         } catch (IOException e) {
-            return e.getMessage();
+            e.getMessage();
         }
+
+        return "0";
+
     }
+
+    private String buildPostDataString(Map<String, String> params) throws UnsupportedEncodingException {
+        StringBuilder result = new StringBuilder();
+        boolean first = true;
+        for (Map.Entry<String, String> entry : params.entrySet()) {
+            if (first) {
+                first = false;
+            } else {
+                result.append("&");
+            }
+
+            result.append(URLEncoder.encode(entry.getKey(), "UTF-8"));
+            result.append("=");
+            result.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
+        }
+
+        return result.toString();
+    }
+
 
     @Override
     protected void onPostExecute(String result) {
-       // Toast.makeText(context, result, Toast.LENGTH_LONG).show();
+        delegate.processFinish(result);
     }
 }

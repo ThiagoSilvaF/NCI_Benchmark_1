@@ -19,11 +19,15 @@ import ie.aomonitor.ConfigLog;
 import ie.aomonitor.Monitor;
 import ie.aomonitor.endpoints.AsyncResponse;
 import ie.ncirl.nci_benchmark_1.endpoints.EndpointsAsyncTask;
+import ie.ncirl.nci_benchmark_1.endpoints.RunConfigAsyncTask;
 
 public class Benchmark extends AppCompatActivity {
 
     private TextView result;
     private Button compute;
+
+    private Button btnRunConfig;
+
     private String teststring;
     private String HashValue;
     private String tt;
@@ -32,13 +36,28 @@ public class Benchmark extends AppCompatActivity {
 
     private String testeEnv = "def";
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_benchmark);
 
         compute=(Button)findViewById(R.id.btn1);
+        btnRunConfig = (Button) findViewById(R.id.button2);
+
+        this.btnRunConfig.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                RunConfigAsyncTask eat = new RunConfigAsyncTask(new AsyncResponse() {
+                    @Override
+                    public void processFinish(String output) {
+                        System.out.print("process finished!");
+                        //Toast.makeText(getApplicationContext(), output, Toast.LENGTH_LONG).show();
+                    }
+                });
+
+                eat.execute();
+            }
+        });
         result= (TextView)findViewById(R.id.textView2);
         teststring = generateString(9999);///getResources().getString(R.string.teststring);
 
@@ -93,7 +112,7 @@ public class Benchmark extends AppCompatActivity {
 
                         Toast.makeText(getApplicationContext(), output, Toast.LENGTH_LONG).show();
                     }
-                }, password);
+                }, getApplicationContext());
 
 
                 eat.execute();

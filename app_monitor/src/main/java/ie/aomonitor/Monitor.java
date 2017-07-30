@@ -12,6 +12,7 @@ import java.sql.Connection;
 import java.util.HashMap;
 
 import ie.aomonitor.endpoints.AsyncResponse;
+import ie.aomonitor.endpoints.GetConfigServletAsyncTask;
 import ie.aomonitor.endpoints.PersistLogsServletAsyncTask;
 import ie.aomonitor.endpoints.SyncDeviceServletAsyncTask;
 import ie.aomonitor.utils.Connectivity;
@@ -148,6 +149,16 @@ public abstract class Monitor extends Thread {
     }
 
     public static void syncDeviceProfile(Context context, String json) {
+
+        GetConfigServletAsyncTask getConfig = new GetConfigServletAsyncTask( json , new AsyncResponse() {
+
+            @Override
+            public void processFinish(String output) {
+                System.out.print(output);
+            }
+
+        });
+        getConfig.execute(new Pair<Context, String>(context, json));
 
         PersistLogsServletAsyncTask persistTask = new PersistLogsServletAsyncTask(new AsyncResponse() {
 

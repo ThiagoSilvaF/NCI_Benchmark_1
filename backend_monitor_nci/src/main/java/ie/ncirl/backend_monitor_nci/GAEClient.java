@@ -2,16 +2,8 @@ package ie.ncirl.backend_monitor_nci;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
-import com.google.cloud.Timestamp;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
-
-import java.io.IOException;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Administrativo on 01/07/2017.
@@ -19,14 +11,9 @@ import java.util.List;
 
 public class GAEClient {
 
-    private DatastoreService datastore;
-
+    private static DatastoreService datastore;
 
     public void  addProcessInfoToTheCloud(DeviceLog device) {
-        //Type listType = new TypeToken<ArrayList<DeviceLog>>(){}.getType();
-        //List<DeviceLog> listDL = new Gson().fromJson(jsonParam, listType);
-
-        //for (DeviceLog device : listDL) {
             datastore = DatastoreServiceFactory.getDatastoreService(); // Authorized Datastore service
             Entity task =  new Entity("devices");
             task.setProperty("brand", device.getBrand());
@@ -45,6 +32,18 @@ public class GAEClient {
             task.setProperty("environment", device.getEnvironment());
 
             Key bookKey = datastore.put(task); // Save the Entity
-        //}
     }
+
+
+        public static void addConfigToTheCloud(Config c) {
+                datastore = DatastoreServiceFactory.getDatastoreService(); // Authorized Datastore service
+                Entity task =  new Entity("configs");
+                task.setProperty("appId", c.getAppId());
+                task.setProperty("device", c.getDevice());
+                task.setProperty("methodName", c.getMethodName());
+                task.setProperty("avgTime", c.getAvgTime());
+                task.setProperty("environment", c.getEnvironment());
+
+                Key bookKey = datastore.put(task); // Save the Entity
+        }
 }

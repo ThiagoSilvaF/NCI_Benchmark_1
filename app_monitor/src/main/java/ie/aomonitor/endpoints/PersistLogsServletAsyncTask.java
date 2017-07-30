@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.support.v4.util.Pair;
 
 
+import com.google.api.client.util.Data;
 import com.google.gson.Gson;
 
 import java.io.BufferedWriter;
@@ -71,7 +72,8 @@ public class PersistLogsServletAsyncTask  extends AsyncTask<Pair<Context, String
 
                 // Read response
                 int responseCode = connection.getResponseCode();
-
+                DatabaseHandler dbh = Monitor.getDbInstance();
+                dbh.deleteAll();
             } catch (IOException e) {
                 e.getMessage();
             }
